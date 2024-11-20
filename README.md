@@ -3,7 +3,8 @@ Optimized packaging material availability and vendor delivery management by auto
 
 ![image](https://github.com/user-attachments/assets/d927d58a-f78d-4a2c-9373-02545828513d)                                   
 
-
+```sql
+#flow chart for basic understanding
 Start
    ↓
 [Data Import Through MySQL Query]
@@ -15,3 +16,4 @@ Start
 [Publish Report]
    ↓
 End
+```
