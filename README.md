@@ -17,31 +17,72 @@ Start
    ↓
 End
 ```
+# Let's understand this project step by step
+# Step 1: Create a MySQL Query to Fetch Required Data
 
-Step 2: Create a MySQL Query to Fetch Required Data
-Write a MySQL query to fetch the required data that will be used for visualization. Ensure that your query returns accurate and clean data.
+**Write a MySQL query to fetch the required data that will be used for visualization. Ensure that your query returns accurate and clean data.**
 
-Example:
-
-sql
-Copy code
+```sql
+#Fetched these columns by writing this query.
 SELECT 
     store_code AS "Store Code",
     store_name AS "Store Name",
     region AS "Region",
+    code AS "Code",
+    cc AS "CC",
+    target_average AS "Target/Average",
+    category AS "Category",
     material_description AS "Material Description",
-    closing_stock_physical AS "Closing Stock Physical",
-    pending_qty_from_vendor AS "Pending Qty from Vendor",
-    delivery_date AS "Delivery Date",
-    target_average AS "Target Average",
-    average_per_day AS "Average per Day",
+    per_unit_cost AS "Per Unit COST",
+    uom AS "UOM",
+    closing_stock_physical AS "Closing Stock Physical as on 4 Nov'24",
+    average_per_day AS "Average Per Day (Last 30 Days)",
     current_doi AS "Current DOI"
 FROM 
     packaging_material_data
-LEFT JOIN 
-    vendor_orders ON packaging_material_data.cc = vendor_orders.cc
 WHERE 
-    packaging_material_data.date = '2024-11-04';
+    date = '2024-11-04';
+```
+
+```sql
+#fetched this data from another table to identify the material to be dispatched.
+SELECT 
+    cc AS "CC",
+    pending_qty_from_vendor AS "Pending Qty From Vendor Side",
+    minimum_order_qty AS "Minimum Order Qty"
+FROM 
+    vendor_orders;
+```
+```sql
+
+# Merged both datasets to compile this into one table
+SELECT  
+    p.store_code AS "Store Code",
+    p.store_name AS "Store Name",
+    p.region AS "Region",
+    p.code AS "Code",
+    p.cc AS "CC",
+    p.target_average AS "Target/Average",
+    p.category AS "Category",
+    p.material_description AS "Material Description",
+    p.per_unit_cost AS "Per Unit COST",
+    p.uom AS "UOM",
+    p.closing_stock_physical AS "Closing Stock Physical as on 4 Nov'24",
+    p.average_per_day AS "Average Per Day (Last 30 Days)",
+    p.current_doi AS "Current DOI",
+    v.pending_qty_from_vendor AS "Pending Qty From Vendor Side",
+    v.minimum_order_qty AS "Minimum Order Qty"
+FROM 
+    packaging_material_data p
+LEFT JOIN 
+    vendor_orders v
+ON 
+    p.cc = v.cc
+WHERE 
+    p.date = '2024-11-04';
+
+```
+
 Step 3: Connect Power BI to MySQL Database
 To connect Power BI to MySQL Workbench, follow these steps:
 
