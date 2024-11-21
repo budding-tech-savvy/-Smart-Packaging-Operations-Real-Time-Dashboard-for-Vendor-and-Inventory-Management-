@@ -35,9 +35,8 @@ SELECT
     material_description AS "Material Description",
     per_unit_cost AS "Per Unit COST",
     uom AS "UOM",
-    closing_stock_physical AS "Closing Stock Physical as on 4 Nov'24",
+    closing_stock_physical AS "Closing Stock Physical as on current_date",
     average_per_day AS "Average Per Day (Last 30 Days)",
-    current_doi AS "Current DOI"
 FROM 
     packaging_material_data
 WHERE 
