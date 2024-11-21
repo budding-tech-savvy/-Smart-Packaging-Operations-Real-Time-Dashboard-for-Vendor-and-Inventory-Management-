@@ -83,6 +83,8 @@ WHERE
 
 ```
 
+
+
 Step 3: Connect Power BI to MySQL Database
 To connect Power BI to MySQL Workbench, follow these steps:
 
