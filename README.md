@@ -115,6 +115,51 @@ Create new columns or measures, such as Total Pending Qty or Days of Inventory.<
 Example of creating a new column for "Days of Inventory":<br>
 
 **Formula: Days of Inventory = Closing Stock / Average Per Day**
+```sql
+#calculated closing stock amount
+closing_cost_as_on_currenct_date = Projection[per_unit_cost]*Projection[closing_stock_as_on_current_date]
+#to find out the current days of inventory availbale at stores/hub
+current_doi = iferror(Projection[Total_qty_after_vendor]/Projection[average_of_stock_used_in_store],0)
+
+#final qty calculated based on minimum qty order of vendors 
+final_qty_as_per_vendor_moq = if(and(Projection[total_required_qty]<Projection[minimum_order_qty],Projection[total_required_qty]<>0),Projection[minimum_order_qty],Projection[total_required_qty])
+
+#inserted this measured to find out total_material cost to be procured
+total_material_cost = Projection[final_qty_as_per_vendor_moq]*Projection[per_unit_cost]
+
+#calculated based on sum of currecnt stock and stock to be delivered by vendor.
+Total_qty_after_vendor = Projection[closing_stock_as_on_current_date]+Projection[pending_qty_from_vendor_end]
+
+#Actual total required qty based on average consumption at stores 
+total_required_qty = Projection[average_of_stock_used_in_store]*Projection[total_required_qty_in_days_60-days_cycle] 
+
+#total material to be purchased in days based on maintaining 60 days of material retention
+total_required_qty_in_days_60-days_cycle = if((if((Projection[average_of_stock_used_in_store])=0,0,60-Projection[current_doi]))<0,0,if((Projection[average_of_stock_used_in_store])=0,0,60-Projection[current_doi]))
+
+#created table to make bar chart more dynamic 
+rank_table = datatable(
+                       "sr",INTEGER,
+                        "type" ,string,"no",INTEGER,
+                        {
+                           {0,"All",0},
+                           {1,"Top 5",5},
+                           {2,"Top 10",10} ,
+                           {3,"Top 15",15} 
+                        }
+)
+
+rank_table1 = var rank1=rankx(all(Projection[material_description]),[average_of_material],,DESC,Dense)
+             var rank2=SELECTEDVALUE(rank_table[no])
+
+return
+if(rank2=0,[average_of_material],if(rank1<=rank2,[average_of_material],blank()))
+
+dynamic_title = var selectedvalue1=SELECTEDVALUE(rank_table[no])
+return
+if(selectedvalue1=0,"Top All Article based on Average","Top"&" "&selectedvalue1&" "&"Article based on Average")
+```
+
+
 
 # Step 5: Create Relationships (if needed)
 If your data is coming from multiple tables (e.g., packaging materials and vendor orders), make sure the relationships between tables are correctly set:
